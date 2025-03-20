@@ -1,0 +1,105 @@
+openapi: 3.0.3
+
+info:
+  title: ${apigateway_name}
+  description: ${apigateway_description}
+  version: 0.1.0
+
+components:
+  schemas:
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+  securitySchemes:
+   Authorizer:
+    type: "apiKey"
+    name: "auth"
+    in: "header"
+    x-amazon-apigateway-authtype: "custom"
+    x-amazon-apigateway-authorizer:
+      authorizerUri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${lambda_authorizer_arn}/invocations"
+      authorizerResultTtlInSeconds: 300
+      identitySource: "method.request.header.authorization, context.resourcePath"
+      type: "request"
+
+
+paths:
+  /your_path/{your_param}:
+    get:
+      operationId: get/your_path
+      description: Lorem ipsum dolor sit amet
+      security:
+        - Authorizer: []
+      parameters:
+        - name: your_param
+          in: path
+          required: true
+          description: Lorem ipsum dolor sit amet
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${account_id}:function:FUNCTION_NAME/invocations"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        timeoutInMillis: 29000
+        type: "aws_proxy"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+      - CORS
+      responses:
+        200:
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+  /your_path:
+    post:
+      operationId: post/your_path
+      description: lorem ipsum dolor sit amet
+      security:
+        - Authorizer: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${account_id}:function:FUNCTION_NAME/invocations"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        timeoutInMillis: 29000
+        type: "aws_proxy"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
