@@ -7,9 +7,13 @@ from google.auth.transport import requests
 
 client = boto3.client('dynamodb')
 
+GOOGLE_CLIENT_ID = os.environ['GOOGLE_CLIENT_ID']
+VALIDADE_USER = os.environ['VALIDADE_USER']
+
+
 def google_validate_token(token):
     try:
-        idinfo = id_token.verify_oauth2_token(token, requests.Request(), os.environ['GOOGLE_CLIENT_ID'])
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_CLIENT_ID)
         print(idinfo)
 
         # If the token is valid, return the user's email.
@@ -37,17 +41,19 @@ def dynamodb_validade_email(email):
         return False
     
 
-def validade_token_and_email(token):
+def validade_token_and_email(token, validade_user):
     email = google_validate_token(token)
-    if email:
+
+    if validade_user == 'true' and email:
         return dynamodb_validade_email(email)
-    else:
-        return False
+
+    if email:
+        return True
+    
+    return False
 
 
 def lambda_handler(event, context):
-    print(event)
-
     # Retrieve request parameters from the Lambda function input:
     headers = event['headers']
 
@@ -63,16 +69,15 @@ def lambda_handler(event, context):
     # and the 'Unauthorized' error, otherwise.
 
     token = headers.get('Authorization', headers.get('authorization'))
+    
 
-    if (validade_token_and_email(token)):
+    if (validade_token_and_email(token, VALIDADE_USER)):
         response = generateAllow('me', event['methodArn'])
         print('authorized')
         return response
     else:
         print('unauthorized')
         raise Exception('Unauthorized') # Return a 401 Unauthorized response
-
-    # Help function to generate IAM policy
 
 
 def generatePolicy(principalId, effect, resource):

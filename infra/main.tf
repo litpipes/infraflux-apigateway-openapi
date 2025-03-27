@@ -30,6 +30,7 @@ module "lambda_function_auth" {
 
   environment_variables = {
     GOOGLE_CLIENT_ID = var.google_client_id
+    VALIDADE_USER    = var.apigateway_auth_validade_user
   }
 
   create_package         = false

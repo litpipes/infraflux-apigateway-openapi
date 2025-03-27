@@ -26,32 +26,7 @@ components:
 
 
 paths:
-  /your_path/{your_param}:
-    get:
-      operationId: get/your_path
-      description: Lorem ipsum dolor sit amet
-      security:
-        - Authorizer: []
-      parameters:
-        - name: your_param
-          in: path
-          required: true
-          description: Lorem ipsum dolor sit amet
-          schema:
-            type: string
-      x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${account_id}:function:FUNCTION_NAME/invocations"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        timeoutInMillis: 29000
-        type: "aws_proxy"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Message"
+  /your_path:
     options:
       summary: CORS support
       description: |
@@ -84,22 +59,3 @@ paths:
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
               method.response.header.Access-Control-Allow-Methods: "'*'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
-  /your_path:
-    post:
-      operationId: post/your_path
-      description: lorem ipsum dolor sit amet
-      security:
-        - Authorizer: []
-      x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${account_id}:function:FUNCTION_NAME/invocations"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        timeoutInMillis: 29000
-        type: "aws_proxy"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Message"
