@@ -9,6 +9,7 @@ env:
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "${{ vars.TF_WORKSPACE }}-prod"
   CONFIG_DIRECTORY: "./infra/"
+  INVENTORY_DIRECTORY: "./infra/inventories/prod"
 
 jobs:
   set-vars:
@@ -61,6 +62,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      
+      - name: Move invertory to infra directory
+        run: |
+          mv ${{ env.INVENTORY_DIRECTORY }}/terraform.tfvars ${{ env.CONFIG_DIRECTORY }}/terraform.auto.tfvars
 
       - name: Download lambda package
         uses: actions/download-artifact@v4
@@ -99,6 +104,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Move invertory to infra directory
+        run: |
+          mv ${{ env.INVENTORY_DIRECTORY }}/terraform.tfvars ${{ env.CONFIG_DIRECTORY }}/terraform.auto.tfvars
       
       - name: Download lambda package
         uses: actions/download-artifact@v4

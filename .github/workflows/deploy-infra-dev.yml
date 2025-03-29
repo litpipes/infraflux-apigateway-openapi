@@ -2,13 +2,14 @@ name: Deploy Infra Terraform for Api Gateway
 on:
   push:
     branches:
-      - main
+      - develop
 
 env:
   TF_CLOUD_ORGANIZATION: "${{ vars.TF_CLOUD_ORGANIZATION }}"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "${{ vars.TF_WORKSPACE }}-dev"
   CONFIG_DIRECTORY: "./infra/"
+  INVENTORY_DIRECTORY: "./infra/inventories/dev"
 
 jobs:
   set-vars:
@@ -62,6 +63,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Move invertory to infra directory
+        run: |
+          mv ${{ env.INVENTORY_DIRECTORY }}/terraform.tfvars ${{ env.CONFIG_DIRECTORY }}/terraform.auto.tfvars
+
       - name: Download lambda package
         uses: actions/download-artifact@v4
         with:
@@ -99,6 +104,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Move invertory to infra directory
+        run: |
+          mv ${{ env.INVENTORY_DIRECTORY }}/terraform.tfvars ${{ env.CONFIG_DIRECTORY }}/terraform.auto.tfvars
       
       - name: Download lambda package
         uses: actions/download-artifact@v4
